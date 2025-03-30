@@ -3,74 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redireccionando a YouTube</title>
+    <title>Redirección a Video YouTube</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
         }
-        .message {
+        .container {
             text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 0.5s ease-out;
         }
-        .message h1 {
-            font-size: 24px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .youtube-logo {
+            width: 80px;
             margin-bottom: 20px;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
         }
-        .message p {
-            font-size: 16px;
-            margin-bottom: 20px;
+        h1 {
+            color: #FF0000;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
         }
-        .message a {
-            color: #007bff;
+        p {
+            color: #606060;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .countdown {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FF0000;
+            margin: 0 5px;
+        }
+        .btn {
+            display: inline-block;
+            background: #FF0000;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
             text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2);
         }
-        .hidden {
-            display: none;
+        .btn:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 0, 0, 0.25);
+        }
+        .loader {
+            border: 4px solid rgba(255, 0, 0, 0.1);
+            border-left-color: #FF0000;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
-    <script type="text/javascript">
-        // Función para detectar si es un dispositivo móvil
+</head>
+<body>
+    <div class="container">
+        <img src="https://www.youtube.com/s/desktop/d743f786/img/favicon_96x96.png" alt="YouTube" class="youtube-logo">
+        <h1>Redireccionando al Video</h1>
+        <div class="loader"></div>
+        <p>Estás siendo redirigido al contenido en <span class="countdown" id="countdown">5</span> segundos...</p>
+        <a href="https://youtu.be/DBqSoqcQSHE" class="btn">Ver Video Ahora</a>
+    </div>
+
+    <script>
+        // Configuración del video
+        const VIDEO_ID = "DBqSoqcQSHE";
+        const DEEP_LINK = `vnd.youtube://${VIDEO_ID}`;
+        const WEB_URL = `https://youtu.be/${VIDEO_ID}`;
+        const APP_URL = `https://www.youtube.com/watch?v=${VIDEO_ID}`;
+        
+        // Elementos del DOM
+        const countdownEl = document.getElementById('countdown');
+        
+        // Cuenta regresiva
+        let seconds = 4;
+        const timer = setInterval(() => {
+            countdownEl.textContent = seconds;
+            if (seconds <= 0) clearInterval(timer);
+            seconds--;
+        }, 1000);
+        
+        // Detección de dispositivo
         function isMobile() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         }
-
-        // Enlace profundo de YouTube (intenta abrir la app)
-        const youtubeDeepLink = "vnd.youtube://OxJh-INetYg";
-        // Enlace web de YouTube (como respaldo)
-        const youtubeWebUrl = "https://youtu.be/OxJh-INetYg";
-
-        // Función para intentar abrir la app
-        function tryOpenApp() {
-            window.location.href = youtubeDeepLink;
-            setTimeout(function() {
-                // Si no se abre la app, redirige a la versión web
-                window.location.href = youtubeWebUrl;
-            }, 1000); // Espera 1 segundo antes de redirigir
+        
+        // Estrategia de redirección
+        function redirect() {
+            if (!isMobile()) {
+                window.location.href = WEB_URL;
+                return;
+            }
+            
+            // 1er intento: Deep Link nativo
+            window.location.href = DEEP_LINK;
+            
+            // 2do intento: URL de app (para iOS)
+            setTimeout(() => {
+                window.location.href = APP_URL;
+            }, 800);
+            
+            // 3er intento: URL web normal
+            setTimeout(() => {
+                window.location.href = WEB_URL;
+            }, 2000);
         }
-
-        // Redirección inicial
-        if (isMobile()) {
-            tryOpenApp(); // Intenta abrir la app directamente
-        } else {
-            // Si no es un dispositivo móvil, redirige a la versión web
-            window.location.href = youtubeWebUrl;
-        }
+        
+        // Iniciar redirección después de 1.5s para permitir ver el mensaje
+        setTimeout(redirect, 1500);
     </script>
-</head>
-<body>
-    <div class="message" id="initial-message">
-        <h1>Redirigiendo a YouTube</h1>
-        <p>Por favor, espera mientras intentamos abrir la aplicación de YouTube.</p>
-        <p>Si no se abre automáticamente, haz clic <a href="https://youtu.be/OxJh-INetYg">aquí</a>.</p>
-    </div>
 </body>
 </html>
